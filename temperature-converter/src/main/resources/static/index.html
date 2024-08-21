@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        input, button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Temperature Converter</h1>
+    <form id="converterForm">
+        <input type="text" id="temperatureInput" placeholder="Enter temperature" required>
+        <button type="button" onclick="convertToCelsius()">Convert to Celsius</button>
+        <button type="button" onclick="convertToFahrenheit()">Convert to Fahrenheit</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        function isValidNumber(value) {
+            return !isNaN(value) && value.trim() !== "";
+        }
+
+        function convertToCelsius() {
+            const input = document.getElementById('temperatureInput').value;
+            if (isValidNumber(input)) {
+                fetch(`/api/convert/toCelsius?fahrenheit=${input}`)
+                    .then(response => response.text())
+                    .then(data => document.getElementById('result').innerText = data)
+                    .catch(error => console.error('Error:', error));
+            } else {
+                document.getElementById('result').innerText = "Invalid Input";
+            }
+        }
+
+        function convertToFahrenheit() {
+            const input = document.getElementById('temperatureInput').value;
+            if (isValidNumber(input)) {
+                fetch(`/api/convert/toFahrenheit?celsius=${input}`)
+                    .then(response => response.text())
+                    .then(data => document.getElementById('result').innerText = data)
+                    .catch(error => console.error('Error:', error));
+            } else {
+                document.getElementById('result').innerText = "Invalid Input";
+            }
+        }
+    </script>
+</body>
+</html>
