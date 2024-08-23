@@ -17,24 +17,62 @@ public class TemperatureConverterIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    public void testConvertToCelsiusEndpoint() throws Exception {
-        mockMvc.perform(get("/api/convert/toCelsius").param("fahrenheit", "32"))
+    public void testConvertCelsiusToFahrenheit() throws Exception {
+        mockMvc.perform(get("/api/convert")
+                .param("temperature", "0")
+                .param("fromScale", "Celsius")
+                .param("toScale", "Fahrenheit"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("32.00 Fahrenheit is 0.00 Celsius"));
-
-        mockMvc.perform(get("/api/convert/toCelsius").param("fahrenheit", "abc"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Invalid Input"));
+                .andExpect(content().string("0.00 Celsius is 32.00 Fahrenheit"));
     }
 
     @Test
-    public void testConvertToFahrenheitEndpoint() throws Exception {
-        mockMvc.perform(get("/api/convert/toFahrenheit").param("celsius", "0"))
+    public void testConvertFahrenheitToCelsius() throws Exception {
+        mockMvc.perform(get("/api/convert")
+                .param("temperature", "32")
+                .param("fromScale", "Fahrenheit")
+                .param("toScale", "Celsius"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("0.00 Celsius is 32.00 Fahrenheit"));
+                .andExpect(content().string("32.00 Fahrenheit is 0.00 Celsius"));
+    }
 
-        mockMvc.perform(get("/api/convert/toFahrenheit").param("celsius", "abc"))
+    @Test
+    public void testConvertCelsiusToKelvin() throws Exception {
+        mockMvc.perform(get("/api/convert")
+                .param("temperature", "0")
+                .param("fromScale", "Celsius")
+                .param("toScale", "Kelvin"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Invalid Input"));
+                .andExpect(content().string("0.00 Celsius is 273.15 Kelvin"));
+    }
+
+    @Test
+    public void testConvertKelvinToRankine() throws Exception {
+        mockMvc.perform(get("/api/convert")
+                .param("temperature", "0")
+                .param("fromScale", "Kelvin")
+                .param("toScale", "Rankine"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("0.00 Kelvin is 0.00 Rankine"));
+    }
+
+    @Test
+    public void testConvertReaumurToFahrenheit() throws Exception {
+        mockMvc.perform(get("/api/convert")
+                .param("temperature", "80")
+                .param("fromScale", "Réaumur")
+                .param("toScale", "Fahrenheit"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("80.00 Réaumur is 212.00 Fahrenheit"));
+    }
+
+    @Test
+    public void testInvalidScale() throws Exception {
+        mockMvc.perform(get("/api/convert")
+                .param("temperature", "0")
+                .param("fromScale", "InvalidScale")
+                .param("toScale", "Celsius"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Unsupported scale: InvalidScale"));
     }
 }
