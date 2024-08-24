@@ -11,6 +11,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background-color 0.3s, color 0.3s;
         }
         #converterForm {
             display: flex;
@@ -40,9 +41,28 @@
             border-radius: 10px;
             transition: height 0.5s;
         }
+        #modeToggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        .dark-mode #thermometer {
+            background-color: #555;
+            border-color: #fff;
+        }
+        .dark-mode input, .dark-mode select, .dark-mode button {
+            background-color: #555;
+            color: #fff;
+            border: 1px solid #fff;
+        }
     </style>
 </head>
 <body>
+    <button id="modeToggle">Toggle Dark Mode</button>
     <h1>Temperature Converter</h1>
     <form id="converterForm">
         <input type="number" id="temperatureInput" placeholder="Enter temperature" required>
@@ -73,21 +93,16 @@
             const fromScale = document.getElementById('fromScale').value;
             const toScale = document.getElementById('toScale').value;
 
-            if (isValidNumber(temperature)) {
-                fetch(`/api/convert?temperature=${temperature}&fromScale=${fromScale}&toScale=${toScale}`)
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById('result').innerText = data;
-                        updateThermometer(parseFloat(temperature), fromScale);
-                    })
-                    .catch(error => console.error('Error:', error));
-            } else {
-                document.getElementById('result').innerText = "Invalid Input";
-            }
-        }
-
-        function isValidNumber(value) {
-            return !isNaN(value) && value.trim() !== "";
+            fetch(`/api/convert?temperature=${temperature}&fromScale=${fromScale}&toScale=${toScale}`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('result').innerText = data;
+                    updateThermometer(parseFloat(temperature), fromScale);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('result').innerText = "An error occurred during conversion.";
+                });
         }
 
         function updateThermometer(temperature, scale) {
@@ -103,6 +118,26 @@
             const mercury = document.getElementById('mercury');
             const height = Math.min(Math.max((celsius + 30) / 100 * 180, 0), 180); // Scale from -30°C to 70°C
             mercury.style.height = `${height}px`;
+        }
+
+        // Dark mode toggle functionality
+        const modeToggle = document.getElementById('modeToggle');
+        const body = document.body;
+
+        modeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            // Save the current mode preference
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+
+        // Check for saved mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
         }
     </script>
 </body>
